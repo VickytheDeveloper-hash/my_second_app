@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Preview Blog</title>
+  <link rel="stylesheet" href="./css/app.css" />
+</head>
+<style>
+  button {
+    display: inline-block;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 10px 10px 0 0;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #2980b9;
+  }
+</style>
+<body>
+  <h1>Blog Preview</h1>
+  <div id="preview-container">
+    <h2 id="preview-title"></h2>
+    <img id="preview-image" src="" alt="Preview Image" width="300" />
+    <div id="preview-content"></div>
+  </div>
+
+  <br><br>
+  <button onclick="window.location.href='index.html'">Back to Homepage</button>
+  <button id="publish-btn">Publish Blog</button>
+  <button onclick="window.location.href='blog-collection.html'">Go to Blog Collection</button>
+  
+
+  <script>
+    const previewData = JSON.parse(localStorage.getItem('blogPreview'));
+
+    if (!previewData) {
+      document.getElementById('preview-container').innerHTML = '<p>No preview data found.</p>';
+    } else {
+      document.getElementById('preview-title').textContent = previewData.title;
+      document.getElementById('preview-image').src = previewData.imageUrl;
+      document.getElementById('preview-content').innerHTML = previewData.content;
+    }
+
+    document.getElementById('publish-btn').addEventListener('click', async () => {
+      if (!previewData) return;
+
+      const formData = new FormData();
+      formData.append('title', previewData.title);
+      formData.append('content', previewData.content);
+
+      // Convert base64 image URL to File
+      const response = await fetch(previewData.imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "blog-image.jpg", { type: blob.type });
+
+      formData.append('image', file);
+
+      try {
+        const res = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          alert("Blog published successfully!");
+          window.location.href = 'blog-collection.html'; // or redirect to /blog if using server route
+        } else {
+          alert("Failed to publish blog.");
+        }
+      } catch (err) {
+        console.error("Upload error:", err);
+        alert("Error uploading blog.");
+      }
+    });
+  </script>
+</body>
+</html>
