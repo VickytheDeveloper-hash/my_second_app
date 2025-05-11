@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog Collection</title>
+  <link rel="stylesheet" href="./css/app.css" />
+  <style>
+    #blog-collection{
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      background: linear-gradient(135deg, #3a7bd5, #3a3a3a, #ff7e5f);
+    }
+    .blog-card {
+      display: flex;
+      flex-direction: column;
+      width: 300px;
+      margin: 20px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    .blog-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+    .blog-card h3 {
+      margin: 10px 0;
+      font-size: 1.2rem;
+    }
+    .blog-card p {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    .read-more {
+      color: #3498db;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Blog Collection</h1>
+  <div id="blog-collection"></div>
+
+  <script>
+    // Fetch blog data from the server
+    fetch('/blog-json')
+      .then(response => response.json())
+      .then(blogs => {
+        const collectionContainer = document.getElementById('blog-collection');
+        
+        // Clear the collection container before appending new cards
+        collectionContainer.innerHTML = '';
+
+        blogs.forEach(blog => {
+          // Create a blog card
+          const card = document.createElement('div');
+          card.className = 'blog-card';
+          
+          // Add image
+          const image = document.createElement('img');
+          image.src = blog.imageUrl;
+          card.appendChild(image);
+          
+          // Add title
+          const title = document.createElement('h3');
+          title.textContent = blog.title;
+          card.appendChild(title);
+
+          // Add description (show only first 100 characters)
+          const description = document.createElement('p');
+          description.textContent = blog.content.substring(0, 100) + '...';
+          card.appendChild(description);
+          
+          // Add Read More link
+          const readMore = document.createElement('a');
+          readMore.href = `/blog/${blog.slug}`;
+          readMore.className = 'read-more';
+          readMore.textContent = 'Read more';
+          card.appendChild(readMore);
+
+          // Append card to collection container
+          collectionContainer.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error("Error fetching blogs:", err);
+        document.getElementById('blog-collection').innerHTML = '<p>Failed to load blog posts.</p>';
+      });
+  </script>
+</body>
+</html>
