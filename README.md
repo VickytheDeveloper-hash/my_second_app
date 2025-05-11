@@ -1,2 +1,2 @@
 # my_second_app
-A web application for class booking system at TUK.
+A web application for a class booking system at TUK.
